@@ -1,8 +1,9 @@
 from collections import namedtuple
+import torchvision.transforms as transforms
 
-CLASSIFIER_ARCH = "vgg16"
-CLASSIFIER_TRAINED = "Trained_model\classifier_cifar10.pth"
-DATASET = "cifar10_splits"
+CLASSIFIER_ARCH = "restnet26"
+CLASSIFIER_TRAINED = "Trained_model/ep=90_lv=0.38.pth"
+DATASET = "cifar10"
 BATCH_SIZE = 32
 EPS = 20
 EPSILON = 0.1
@@ -14,6 +15,11 @@ MAX_ITER = 600
 NOISE_SD = 0.005
 GAMMA = 0.9
 TARGET_UPDATE = 1000
+
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Assuming CIFAR-10 normalization
+])
 
 INPUT_DQN_SIZE = 580 # 512 + 64 + 4
 OUTPUT_DQN_SIZE = 64

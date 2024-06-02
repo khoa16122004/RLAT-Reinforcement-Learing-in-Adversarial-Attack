@@ -19,16 +19,16 @@ def main():
     
     # ------------------------------ Dataloader -------------------------------
     test_dataset = get_dataset(DATASET, "test")
-    test_loader = DataLoader(test_dataset, shuffle=False, batch_size=BATCH_SIZE,
-                                 num_workers=2)
+    test_loader = DataLoader(test_dataset, shuffle=False, batch_size=256,
+                                 num_workers=1)
 
     acc_meter = AverageMeter()
     with torch.no_grad():
-        for imgs, targets in tqdm(test_loader):
+        for (imgs, targets) in tqdm(test_loader):
             imgs, targets = imgs.cuda(), targets.cuda()
-            outputs = clf(imgs)
+            outputs = torch.argmax(clf(imgs), dim=1)
             acc = accuracy(outputs, targets)
-            acc_meter.update(acc[0].item(), imgs.shape[0])
+            acc_meter.update(acc, imgs.shape[0])
         
     print(f"Test Acc: {acc_meter.avg}\n")
 

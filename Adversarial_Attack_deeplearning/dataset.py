@@ -7,6 +7,7 @@ from config import *
 from torchvision.utils import save_image
 from torchvision.io import read_image
 from PIL import Image
+from config import *
 
 DATASETS = ["imagenet", "imagenet32", "cifar10", "mnist", "stl10", "restricted_imagenet"]
 
@@ -60,13 +61,9 @@ def get_num_classes(dataset: str):
 def _cifar10(split: str) -> Dataset:
     dataset_path = os.path.join(os.getenv('PT_DATA_DIR', 'datasets'), 'dataset_cache')
     if split == "train":
-        return datasets.CIFAR10(dataset_path, train=True, download=True, transform=transforms.Compose([
-            # transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()
-        ]))
+        return datasets.CIFAR10(dataset_path, train=True, download=True, transform=transform)
     elif split == "test":
-        return datasets.CIFAR10(dataset_path, train=False, download=True, transform=transforms.ToTensor())
+        return datasets.CIFAR10(dataset_path, train=False, download=True, transform=transform)
 
     else:
         raise Exception("Unknown split name.")

@@ -124,7 +124,6 @@ class Agent():
             action = random.randint(0, self.output_size - 1)
             return action
         with torch.no_grad():
-            print("Khoa")
             output = self.policy_net(state.cuda())
             action = torch.argmax(output).item()
         return int(action)

@@ -35,21 +35,13 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-def accuracy(output, target, topk=(1,)):
-    """Computes the accuracy over the k top predictions for the specified values of k"""
-    with torch.no_grad():
-        maxk = max(topk)
-        batch_size = target.size(0)
-
-        _, pred = output.topk(maxk, 1, True, True)
-        pred = pred.t()
-        correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-        res = []
-        for k in topk:
-            correct_k = torch.flatten(correct[:k], start_dim=0).float().sum(0, keepdim=True)
-            res.append(correct_k.mul_(100.0 / batch_size))
-        return res
+def accuracy(outputs, targets):
+    # Calculate the number of correct predictions
+    correct = (outputs == targets).sum().item()
+    # Total number of predictions
+    total = targets.shape[0]
+    # Calculate accuracy
+    return correct / total
 
 
 def init_logfile(filename: str, text: str):

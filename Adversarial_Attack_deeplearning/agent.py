@@ -246,7 +246,7 @@ class Agent():
                             json.dump(self.loss_lists, f2)
                             json.dump(self.reward_lists, f3)
                          
-                torch.save(self.policy_net.state_dict(), f"model_{ep}.pth")
+                torch.save(self.policy_net.state_dict(), f"/kaggle/working/model_{ep}.pth")
 
         if self.epsilon > 0.1:
             self.epsilon -= 0.9 / 5

@@ -179,8 +179,8 @@ class Agent():
                 P_GT = self.classifier(image.cuda()).cpu() # P_GT
                 pred = torch.argmax(P_GT).item() # label = pred
                 P_pred = P_GT[0][pred] # P_pred   
-                print("\nLabel pred: ", pred)
-                print("Probability Pred: ", P_pred)  
+                # print("\nLabel pred: ", pred)
+                # print("Probability Pred: ", P_pred)  
                                                
                 # init
                 # l2_lists = deque([0, 0, 0, 0], maxlen=4)
@@ -209,7 +209,7 @@ class Agent():
                     P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
                     s = self.sensitity(P_pred, P_noise_pred[pred])
                     reward = self.R(s, l2_norm)
-                    print(reward)
+                    # print(reward)
                     self.reward_lists.append(reward.cpu().item())
                     # print("\nReward: ", reward)
                     
@@ -235,7 +235,7 @@ class Agent():
                     # optimization
                     current_state = next_state
                     loss_ = self.optimize_policy()
-                    print("\nLoss: ", loss_)
+                    # print("\nLoss: ", loss_)
                     self.loss_lists.append(loss_)
                     # torch.cuda.empty_cache()
                     
@@ -245,7 +245,6 @@ class Agent():
                             json.dump(self.action_lists, f1)
                             json.dump(self.loss_lists, f2)
                             json.dump(self.reward_lists, f3)
-                            print()
                          
                 torch.save(self.policy_net.state_dict(), f"model_{ep}.pth")
 

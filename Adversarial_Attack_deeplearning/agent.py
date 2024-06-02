@@ -91,7 +91,8 @@ class Agent():
     def R(self, sensity, l2_norm): # custom
         # print(PD_img_noise, PD_img, l2_norm)
         # reward = -(1e-4)/abs(PD_img - PD_img_noise + 1e-5) + 1 / (l2_norm + 1e-3)
-        reward = -  l2_norm +  sensity / 1e8
+        reward = -  l2_norm +  sensity 
+        
         return reward
         
     def map_index(self, x: int, y: int):
@@ -297,7 +298,7 @@ class Agent():
                     s = self.sensitity(P_pred, P_noise_pred[pred])
                     reward = self.R(s, l2_norm)
                     self.reward_lists.append(reward.cpu().item())
-                    print("\nReward: ", reward)
+                    print(s, l2_norm, reward)
                     
                     # observation
                     sensities = self.cal_sensities(image_clone, P_pred, pred)
@@ -354,7 +355,6 @@ class Agent():
             
             # take action
             action = self.select_action_model(current_state, "test") # index of grid                     
-            print(action)
             # self.action_lists.append(action)
             
             image_clone = self.make_action(image_clone, action)

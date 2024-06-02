@@ -1,9 +1,9 @@
 from collections import namedtuple
 import torchvision.transforms as transforms
 
-CLASSIFIER_ARCH = "restnet26"
-CLASSIFIER_TRAINED = "Trained_model/ep=90_lv=0.38.pth"
-DATASET = "cifar10"
+CLASSIFIER_ARCH = "vgg16"
+CLASSIFIER_TRAINED = "Trained_model\classifier_cifar10.pth"
+DATASET = "cifar10_splits"
 BATCH_SIZE = 32
 EPS = 20
 EPSILON = 0.1

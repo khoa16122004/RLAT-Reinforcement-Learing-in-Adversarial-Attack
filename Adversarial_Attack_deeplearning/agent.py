@@ -320,11 +320,4 @@ class Agent():
                     
                     # optimization
                     current_state = next_state
-                         
-
-     
-
-        
-    
-a = Agent()
-a.test()
+                        

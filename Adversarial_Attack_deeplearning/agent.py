@@ -383,9 +383,9 @@ class Agent():
             # compose state
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
-a = Agent()
+# a = Agent()
 # a.train()
-path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\1.png"
-image = Image.open(path)
-a.inference(image)
+# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\1.png"
+# image = Image.open(path)
+# a.inference(image)
                         

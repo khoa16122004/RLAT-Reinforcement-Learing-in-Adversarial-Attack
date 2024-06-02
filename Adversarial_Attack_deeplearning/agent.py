@@ -190,7 +190,7 @@ class Agent():
                 current_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
                 save_image(image_clone, "view_cal.png")
                 
-                for step in tqdm(range(self.max_iter + 1)):
+                for step in range(self.max_iter + 1):
                     if step == self.max_iter:
                         save_image(image_clone, os.path.join(folder_image, "not_sucess.png"))
                         break

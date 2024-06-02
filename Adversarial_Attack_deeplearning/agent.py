@@ -320,12 +320,12 @@ class Agent():
                     
                     # optimization
                     current_state = next_state
-    def inference(self, img_path):
+    def inference(self, image):
         self.policy_net.load_state_dict(torch.load(DQN_TRAINED))
         
-        image = transforms.ToTensor()(Image.open(img_path)).unsqueeze(0)
+        image = transforms.ToTensor()(image).unsqueeze(0)
         
-        output_folder = os.path.basename(img_path).split(".")[0]
+        output_folder = os.path.basename("test").split(".")[0]
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
         
@@ -381,6 +381,6 @@ class Agent():
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
 a = Agent()
-path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
-a.inference(path)
+# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
+# a.inference(path)
                         

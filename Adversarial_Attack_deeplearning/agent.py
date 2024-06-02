@@ -93,7 +93,7 @@ class Agent():
     def R(self, sensity, l2_norm): # custom
         # print(PD_img_noise, PD_img, l2_norm)
         # reward = -(1e-4)/abs(PD_img - PD_img_noise + 1e-5) + 1 / (l2_norm + 1e-3)
-        reward = -  l2_norm +  sensity
+        reward = -  l2_norm +  sensity / 1e8
         return reward
         
     def map_index(self, x: int, y: int):
@@ -105,7 +105,7 @@ class Agent():
         return x_min, y_min
     
     def sensitity(self, GT_prob: float, GT_noise_prob: float):
-        return  1e3 * abs(GT_prob - GT_noise_prob)
+        return  1e7 * abs(GT_prob - GT_noise_prob)
     
 
     def make_action(self, image, action):
@@ -381,6 +381,7 @@ class Agent():
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
 a = Agent()
-# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
-# a.inference(path)
+path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
+image = Image.open(path)
+a.inference(image)
                         

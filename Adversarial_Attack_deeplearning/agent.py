@@ -91,7 +91,7 @@ class Agent():
     def R(self, sensity, l2_norm): # custom
         # print(PD_img_noise, PD_img, l2_norm)
         # reward = -(1e-4)/abs(PD_img - PD_img_noise + 1e-5) + 1 / (l2_norm + 1e-3)
-        reward = -  l2_norm +  sensity 
+        reward = -  l2_norm +  sensity / 10e4
         
         return reward
         
@@ -104,7 +104,7 @@ class Agent():
         return x_min, y_min
     
     def sensitity(self, GT_prob: float, GT_noise_prob: float):
-        return  1e4 * abs(GT_prob - GT_noise_prob)
+        return  1e11 * abs(GT_prob - GT_noise_prob)
     
 
     def make_action(self, image, action):
@@ -198,6 +198,7 @@ class Agent():
                     # take action
                     action = self.select_action_model(current_state) # index of grid                     
                     # self.action_lists.append(action)
+                    print(action)
                     
                     image_clone = self.make_action(image_clone, action)
                     save_image(image_clone, os.path.join(folder_image, f"process.png"))
@@ -355,6 +356,7 @@ class Agent():
             # take action
             action = self.select_action_model(current_state, "test") # index of grid                     
             # self.action_lists.append(action)
+            print(action)
             
             image_clone = self.make_action(image_clone, action)
             save_image(image_clone, os.path.join(output_folder, f"process_{step}.png")) # os.path.join(output_folder, f"process_{step}.png")
@@ -365,6 +367,9 @@ class Agent():
             P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
             P_lists.append(P_noise_pred)
             print("P_noise: ", P_noise_pred[pred]) 
+            print(sensities)
+            # print(reward)
+            input()
 
             if torch.argmax(P_noise_pred).item() != pred: 
                 save_image(image_clone, os.path.join(output_folder, f"success{l2_norm}.png"))
@@ -378,9 +383,9 @@ class Agent():
             # compose state
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
-# a = Agent()
+a = Agent()
 # a.train()
-# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
-# image = Image.open(path)
-# a.inference(image)
+path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\1.png"
+image = Image.open(path)
+a.inference(image)
                         

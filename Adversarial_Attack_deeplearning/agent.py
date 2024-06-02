@@ -198,7 +198,7 @@ class Agent():
                     # take action
                     action = self.select_action_model(current_state) # index of grid                     
                     # self.action_lists.append(action)
-                    print(action)
+                    # print(action)
                     
                     image_clone = self.make_action(image_clone, action)
                     save_image(image_clone, os.path.join(folder_image, f"process.png"))

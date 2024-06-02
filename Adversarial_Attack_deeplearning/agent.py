@@ -12,7 +12,7 @@ from tqdm import tqdm
 import json
 
 class Agent():
-    def __init__(self, load_DQN=False):
+    def __init__(self, load_DQN=True):
         self.EPS = EPS
         self.epsilon = EPSILON
        
@@ -39,7 +39,7 @@ class Agent():
         self.GAMMA = GAMMA
         if load_DQN:
             print("Loading Trained model")
-            self.policy_net.load_state_dict(torch.load(DQN_TRAINED))
+            self.policy_net.load_state_dict(torch.load(r"/kaggle/input/model-trien-vong-2/model_0_trrenvong_2.pth"))
 
         self.target_net = DQN(self.input_size, self.output_size).cuda()
         self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -384,7 +384,7 @@ class Agent():
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
 # a = Agent()
-# a.train()
+# # a.train()
 # path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\1.png"
 # image = Image.open(path)
 # a.inference(image)

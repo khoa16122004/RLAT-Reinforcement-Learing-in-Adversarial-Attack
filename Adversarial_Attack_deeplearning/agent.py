@@ -104,7 +104,7 @@ class Agent():
         return x_min, y_min
     
     def sensitity(self, GT_prob: float, GT_noise_prob: float):
-        return  1e7 * abs(GT_prob - GT_noise_prob)
+        return  1e3 * abs(GT_prob - GT_noise_prob)
     
 
     def make_action(self, image, action):
@@ -149,7 +149,7 @@ class Agent():
                     x_min, y_min = self.map_index(i, j)
                     image_clone = image.clone()
                     part = image_clone[:, x_min: x_min + self.mask_size, y_min: y_min + self.mask_size]
-                    part = part + mask * 100
+                    part = part + mask 
                     image_clone[:, x_min: x_min + self.mask_size, y_min: y_min + self.mask_size] = part
                     # save_image(image_clone, "view_postion_add_mask.png")
                     P_noise = self.classifier(image_clone.unsqueeze(0).cuda())

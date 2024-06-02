@@ -78,10 +78,8 @@ class Agent():
         next_state_values = torch.max(next_state_values, dim=1)[0]  # Max Q-value for each sample
         
         expected_state_action_values = (next_state_values * self.GAMMA) + batch_rewards
-        # print(state_action_values)
-        # print(expected_state_action_values)
-        
-        loss = self.criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+
+        loss = self.criterion(state_action_values, expected_state_action_values.unsqueeze(0))
         
         self.optimizer.zero_grad()
         loss.backward(retain_graph=True)
@@ -210,6 +208,7 @@ class Agent():
                     P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
                     s = self.sensitity(P_pred, P_noise_pred[pred])
                     reward = self.R(s, l2_norm)
+                    print(reward)
                     self.reward_lists.append(reward.cpu().item())
                     # print("\nReward: ", reward)
                     
@@ -380,8 +379,9 @@ class Agent():
             # compose state
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
-a = Agent()
-path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
-image = Image.open(path)
-a.inference(image)
+# a = Agent()
+# a.train()
+# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\9.png"
+# image = Image.open(path)
+# a.inference(image)
                         

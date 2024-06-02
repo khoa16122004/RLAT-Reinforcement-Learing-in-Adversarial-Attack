@@ -104,7 +104,7 @@ class Agent():
         return x_min, y_min
     
     def sensitity(self, GT_prob: float, GT_noise_prob: float):
-        return  1e3 * abs(GT_prob - GT_noise_prob)
+        return  1e4 * abs(GT_prob - GT_noise_prob)
     
 
     def make_action(self, image, action):

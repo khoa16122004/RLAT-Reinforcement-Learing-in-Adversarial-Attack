@@ -11,7 +11,7 @@ IMG_SIZE = 32 # areas: img_size ^ 2
 MASK_SIZE = 4 # areas: mask_size ^ 2
 NUM_MASKS = 10 
 
-MAX_ITER = 600
+MAX_ITER = 300
 NOISE_SD = 0.005
 GAMMA = 0.9
 TARGET_UPDATE = 1000

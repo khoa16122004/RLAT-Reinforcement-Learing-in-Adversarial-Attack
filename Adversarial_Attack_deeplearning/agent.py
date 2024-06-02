@@ -93,7 +93,7 @@ class Agent():
     def R(self, sensity, l2_norm): # custom
         # print(PD_img_noise, PD_img, l2_norm)
         # reward = -(1e-4)/abs(PD_img - PD_img_noise + 1e-5) + 1 / (l2_norm + 1e-3)
-        reward = - 5 * l2_norm +  sensity
+        reward = - * l2_norm +  sensity
         return reward
         
     def map_index(self, x: int, y: int):
@@ -105,7 +105,7 @@ class Agent():
         return x_min, y_min
     
     def sensitity(self, GT_prob: float, GT_noise_prob: float):
-        return  1e7 * abs(GT_prob - GT_noise_prob)
+        return  1e3 * abs(GT_prob - GT_noise_prob)
     
 
     def make_action(self, image, action):

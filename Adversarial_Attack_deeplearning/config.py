@@ -12,7 +12,7 @@ MASK_SIZE = 4 # areas: mask_size ^ 2
 NUM_MASKS = 10 
 
 MAX_ITER = 600
-NOISE_SD = 0.005
+NOISE_SD = 0.001
 GAMMA = 0.9
 TARGET_UPDATE = 1000
 

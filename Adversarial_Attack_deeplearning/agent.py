@@ -17,7 +17,7 @@ class Agent():
         self.epsilon = EPSILON
        
         classifier = get_architecture(CLASSIFIER_ARCH, "cifar10").eval()
-        classifier.load_state_dict(torch.load(CLASSIFIER_TRAINED))
+        classifier.load_state_dict(torch.load(r"Trained_model/classifier_cifar10.pth"))
         self.classifier = classifier.cuda()
         
         self.img_size = IMG_SIZE

@@ -12,7 +12,7 @@ from tqdm import tqdm
 import json
 
 class Agent():
-    def __init__(self, load_DQN=True):
+    def __init__(self, load_DQN=False):
         self.EPS = EPS
         self.epsilon = EPSILON
        
@@ -48,10 +48,12 @@ class Agent():
         train_dataset = get_dataset(DATASET)
         self.train_dataset = train_dataset
         self.train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+        self.test_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
         self.action_lists = []
         self.reward_lists = []
         self.loss_lists = []
-        
+        self.frequency = [0] * self.num_grids ** 2
+
 
     def cal_l2(self, img, new_img):
         return torch.norm(img - new_img).item()
@@ -88,10 +90,12 @@ class Agent():
 
         return loss.cpu().item()
     
-    def R(self, sensity, l2_norm): # custom
+    def R(self, sensity, l2_norm, action): # custom
         # print(PD_img_noise, PD_img, l2_norm)
         # reward = -(1e-4)/abs(PD_img - PD_img_noise + 1e-5) + 1 / (l2_norm + 1e-3)
-        reward = -  l2_norm +  sensity / 10e4
+
+        reward = -  l2_norm +  sensity / 10e4 -  0.05* self.frequency[action]
+        
         
         return reward
         
@@ -167,7 +171,7 @@ class Agent():
         for ep in range(self.EPS):
             for (image, label, idx) in tqdm(self.train_loader):
                 
-                
+                self.frequency = [0] * self.num_grids ** 2
                 # view the proccess
                 folder_image = os.path.join(TRACK_FOLDER, str(idx.item()))
                 if not os.path.exists(folder_image):
@@ -197,6 +201,7 @@ class Agent():
                     
                     # take action
                     action = self.select_action_model(current_state) # index of grid                     
+                    self.frequency[action] += 1
                     # self.action_lists.append(action)
                     # print(action)
                     
@@ -209,7 +214,7 @@ class Agent():
                     actions_list.append(action)
                     P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
                     s = self.sensitity(P_pred, P_noise_pred[pred])
-                    reward = self.R(s, l2_norm)
+                    reward = self.R(s, l2_norm, action)
                     # print(reward)
                     self.reward_lists.append(reward.cpu().item())
                     # print("\nReward: ", reward)
@@ -252,27 +257,35 @@ class Agent():
         if self.epsilon > 0.1:
             self.epsilon -= 0.9 / 5
 
+    
     def test(self):
-        self.policy_net.load_state_dict(torch.load(DQN_TRAINED))
         
+        avg_l2_norm = 0
+        avg_querry = 0
+        avg_success_rate = 0
+        actions = []
+        
+        self.policy_net.load_state_dict(torch.load(DQN_TRIENVONG))
         self.policy_net.eval()
-        for ep in range(self.EPS):
-            for (image, label, idx) in tqdm(self.train_loader):
+        
+        count = 1
+        with open("results.txt", "w+") as f:
+            for (image, label, idx) in tqdm(self.test_loader):
+                if count == NUM_TESTS:
+                    break
+
                 folder_image = os.path.join(TEST_FOLDER, str(idx.item()))
                 if not os.path.exists(folder_image):
                     os.mkdir(folder_image)
                 save_image(image, os.path.join(folder_image, "origininal.png"))
-                save_image(image, "origininal.png")
                 
                 image_clone = image.clone()
                 P_GT = self.classifier(image.cuda()).cpu() # P_GT
                 pred = torch.argmax(P_GT).item() # label = pred
                 P_pred = P_GT[0][pred] # P_pred   
-                print("\nLabel pred: ", pred)
-                print("Probability Pred: ", P_pred)  
-                                               
+
+                                            
                 # init
-                # l2_lists = deque([0, 0, 0, 0], maxlen=4)
                 actions_list = deque([0, 0, 0, 0], maxlen=4)
                 sensities = self.cal_sensities(image_clone, P_pred, pred)
                 features = self.classifier.features(image_clone.cuda()).view(-1).cpu()                
@@ -280,25 +293,25 @@ class Agent():
                 
                 for step in range(self.max_iter + 1):
                     if step == self.max_iter:
+                        avg_querry += 300
                         save_image(image_clone, os.path.join(folder_image, "not_sucess.png"))
                         break
                     
                     # take action
                     action = self.select_action_model(current_state, "test") # index of grid                     
-                    # self.action_lists.append(action)
-                    
+                    actions.append(action)
+                    print(actions)
+                                        
                     image_clone = self.make_action(image_clone, action)
                     save_image(image_clone, os.path.join(folder_image, f"process.png"))
                     save_image(image_clone, f"process.png")
                     
                     # reward
                     l2_norm = self.cal_l2(image_clone, image)
+                    avg_l2_norm += l2_norm
+                    
                     actions_list.append(action)
                     P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
-                    s = self.sensitity(P_pred, P_noise_pred[pred])
-                    reward = self.R(s, l2_norm)
-                    self.reward_lists.append(reward.cpu().item())
-                    print(s, l2_norm, reward)
                     
                     # observation
                     sensities = self.cal_sensities(image_clone, P_pred, pred)
@@ -309,19 +322,18 @@ class Agent():
 
                     # check success
                     if torch.argmax(P_noise_pred).item() != pred:
-                        
+                        avg_querry += step
+                        avg_success_rate += 1
                         save_image(image_clone, os.path.join(folder_image, f"noise_{l2_norm}.png"))
                         print("Success")
                         break
                     
-                    # next_state.requires_grad_()
-                    # current_state.requires_grad_()
-                    
-                    
-                    # optimization
                     current_state = next_state
+                    count += 1
+            f.write(f"AVG_L2_norm: {avg_l2_norm/NUM_TESTS} \n AVG_querry: {avg_querry/NUM_TESTS} \n AVG_success_rate: {avg_success_rate/NUM_TESTS}\n")        
+                    
     def inference(self, image):
-        self.policy_net.load_state_dict(torch.load(DQN_TRAINED))
+        self.policy_net.load_state_dict(torch.load(DQN_TRIENVONG))
         
         image = transforms.ToTensor()(image).unsqueeze(0)
         
@@ -354,12 +366,12 @@ class Agent():
                 break
             
             # take action
-            action = self.select_action_model(current_state, "test") # index of grid                     
+            action = self.select_action_model(current_state, "train") # index of grid                     
             # self.action_lists.append(action)
             print(action)
             
             image_clone = self.make_action(image_clone, action)
-            save_image(image_clone, os.path.join(output_folder, f"process_{step}.png")) # os.path.join(output_folder, f"process_{step}.png")
+            # save_image(image_clone, os.path.join(output_folder, f"process_{step}.png")) # os.path.join(output_folder, f"process_{step}.png")
             
             # reward
             l2_norm = self.cal_l2(image_clone, image)
@@ -367,9 +379,7 @@ class Agent():
             P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
             P_lists.append(P_noise_pred)
             print("P_noise: ", P_noise_pred[pred]) 
-            print(sensities)
             # print(reward)
-            input()
 
             if torch.argmax(P_noise_pred).item() != pred: 
                 save_image(image_clone, os.path.join(output_folder, f"success{l2_norm}.png"))
@@ -383,9 +393,14 @@ class Agent():
             # compose state
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
-# a = Agent()
+               
+        if self.epsilon > 0.1:
+            self.epsilon -= 0.9 / 5
+            
+# a = Agent(False)
+# # # a.test()
 # # a.train()
-# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\Splits\5\1.png"
+# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\origininal.png"
 # image = Image.open(path)
 # a.inference(image)
                         

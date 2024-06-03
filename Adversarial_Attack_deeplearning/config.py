@@ -1,6 +1,7 @@
 from collections import namedtuple
 import torchvision.transforms as transforms
 
+DQN_TRIENVONG = "model_0_trienvong_6.pth"
 CLASSIFIER_ARCH = "vgg16"
 CLASSIFIER_TRAINED = "Trained_model\classifier_cifar10.pth"
 DATASET = "cifar10_splits"
@@ -15,6 +16,7 @@ MAX_ITER = 300
 NOISE_SD = 0.005
 GAMMA = 0.9
 TARGET_UPDATE = 1000
+NUM_TESTS = 100
 
 transform = transforms.Compose([
     transforms.ToTensor(),

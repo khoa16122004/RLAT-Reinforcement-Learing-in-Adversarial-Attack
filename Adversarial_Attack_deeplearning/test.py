@@ -1,9 +1,7 @@
 import json
-output_path = "test.json"
-a = [1,2,3,4]
-with open(output_path, "w+") as f:
-    json.dump(a, f)
+output_path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\actions.json"
+
     
 with open(output_path, "r") as f:
     b = json.load(f)
-    print(type(b))
+print(t)

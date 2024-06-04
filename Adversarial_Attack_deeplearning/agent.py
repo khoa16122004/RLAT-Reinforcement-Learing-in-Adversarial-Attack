@@ -331,7 +331,6 @@ class Agent():
     def inference(self, image):
         
         self.policy_net.load_state_dict(torch.load(r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\model_0_new.pth"))
-        # self.policy_net.eval()
         self.frequency = [0] * self.num_grids ** 2
 
         image = transforms.ToTensor()(image).unsqueeze(0)

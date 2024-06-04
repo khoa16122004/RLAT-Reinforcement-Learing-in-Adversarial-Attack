@@ -12,6 +12,9 @@ Outline slide:
 # 2. Phát biểu bài toán
 
 - Input/Output, chỉ sự dụng đầu ra của mô hình
+    
+    - Input: Image, Grount truth ( dự đoán của mô hình) 
+    - Output: Adversarial Image successfully betray the model
 
     -> Sử dụng một agent có thể thực hiện Blackbox-AT tốt nhất
 
@@ -30,18 +33,28 @@ Outline slide:
 
 - Agent definition: Chọn ra những vùng nhạy cảm ( fixed grid) để gây ra missclassified để add nhiễu vào
 
-- State: 
-    - current_image features
-    - sensities score of grid: Cho hình ảnh
+- denote:
+    - $\text{img}$: original image
+
+    - $\text{img}_i$: noise image at ith steps
+    
+    - $f$: classification
+    
+    - $e$: feature extraction 
+    
+    - $P_{GT}$: **GT** Classfication Probability of $\text{img}$
+    
+    - $P_{GT_i}$: Classfication Probability of $\text{img}_i$
+    
+    - $s_i$: sensities score of grids of $\text{img}_i$
         
-        - Sử dụng một random mask + tất cả các grids vào và tính sensities score 
 
-- Reward:
-    - l2_norm(current_image, original_image): mục tiêu 1
+- State: $S_i = \{\text{img}_i, s_i\}$ state of ith steps.
 
-    - diff in Probability score of Grount Truth label: mục tiêu 2
 
-        return - l2_norm + diff 
+- Reward: $R_i = - ||\text{img} - \text{img}_i||_2 \quad + |P_{GT} - P_{GT_i}|$
+
+
 
 # 4. Methodology
 
@@ -101,7 +114,7 @@ Outline slide:
             
             return l2_norm + diff - actions_frequency[action]
          
-# 3. Experiment
+# 5. Experiment and Demo
 - Cấu hình máy, number step
 - Dataset
 - Train, Test
@@ -114,7 +127,5 @@ Outline slide:
 ## số liệu
 - AT results
 
-## Demo
-
-## Problem
+##  and Problem
 	

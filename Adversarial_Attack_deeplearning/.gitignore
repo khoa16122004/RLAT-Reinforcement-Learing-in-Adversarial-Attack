@@ -6,3 +6,7 @@ datasets
 Trained_model/Copy_of_cifar10_classifi.ipynb
 Trained_model/ep=90_lv=0.38.pth
 test
+view
+view_test
+checkpoint
+view_new

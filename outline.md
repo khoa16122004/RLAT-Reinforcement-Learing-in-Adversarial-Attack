@@ -14,7 +14,7 @@ Outline slide:
 - Input/Output, chỉ sự dụng đầu ra của mô hình
     
     - Input: Image, Grount truth ( dự đoán của mô hình) 
-    - Output: Adversarial Image successfully betray the model
+    - Output: Adversarial Image successfully pool the model
 
     -> Sử dụng một agent có thể thực hiện Blackbox-AT tốt nhất
 
@@ -31,12 +31,14 @@ Outline slide:
 
 # 3. Modeling
 
-- Agent definition: Chọn ra những vùng nhạy cảm ( fixed grid) để gây ra missclassified để add nhiễu vào
+- Agent definition: finding grid from original image to add the noise mask
 
 - denote:
-    - $\text{img}$: original image
+    - $\text{x}$: original image
 
-    - $\text{img}_i$: noise image at ith steps
+    - $\text{x}_i$: noise image at ith steps
+
+    - $m \in \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})$: radnom vector mask with the same shape with grid
     
     - $f$: classification
     
@@ -49,10 +51,11 @@ Outline slide:
     - $s_i$: sensities score of grids of $\text{img}_i$
         
 
-- State: $S_i = \{\text{img}_i, s_i\}$ state of ith steps.
+- State: $S_i = \{\text{x}_i, s_i\}$ state of ith steps.
 
+- Action: $a_i$: adding to specific grid  of $x_i$
 
-- Reward: $R_i = - ||\text{img} - \text{img}_i||_2 \quad + |P_{GT} - P_{GT_i}|$
+- Reward: $R_i = - ||\text{x} - \text{x}_i||_2 + |P_{GT} - P_{GT_i}|$
 
 
 
@@ -68,8 +71,7 @@ Outline slide:
 
 - Algorithm RL agent for training:
 
-    ```
-        Initialization: Q Network param, N noise_vectors với shape = grid
+        Initialization: Q Network param, $\text{}$
         
         Input: Dataset, Max_iter = 300
         
@@ -97,7 +99,6 @@ Outline slide:
                 update DQN agent
 
                 state <- observation
-    ```
 
 - Problem: 
 

@@ -1,7 +1,7 @@
 from collections import namedtuple
 import torchvision.transforms as transforms
 
-DQN_TRIENVONG = "model_0_trienvong_6.pth"
+DQN_TRIENVONG = "model_0_new_1.pth"
 CLASSIFIER_ARCH = "vgg16"
 CLASSIFIER_TRAINED = "Trained_model\classifier_cifar10.pth"
 DATASET = "cifar10_splits"

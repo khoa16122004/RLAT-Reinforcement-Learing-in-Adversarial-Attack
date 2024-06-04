@@ -22,6 +22,9 @@ def get_dataset(dataset: str, split=None) -> Dataset:
     if dataset == "cifar10_splits":
         return Cifar_10_splts(r"Splits")
     
+    else:
+        return Cifar_10_splts(r"test_splits")
+    
     
 def get_num_classes(dataset: str):
     """Return the number of classes in the dataset. """

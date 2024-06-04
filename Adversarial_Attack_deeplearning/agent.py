@@ -47,8 +47,9 @@ class Agent():
         self.optimizer = optim.Adam(self.policy_net.parameters(),lr=1e-6)
         train_dataset = get_dataset(DATASET)
         self.train_dataset = train_dataset
+        test_dataset = get_dataset("test_split")
         self.train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
-        self.test_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+        self.test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
         self.action_lists = []
         self.reward_lists = []
         self.loss_lists = []
@@ -263,16 +264,13 @@ class Agent():
         avg_l2_norm = 0
         avg_querry = 0
         avg_success_rate = 0
-        actions = []
         
-        self.policy_net.load_state_dict(torch.load(DQN_TRIENVONG))
-        self.policy_net.eval()
+        self.policy_net.load_state_dict(torch.load(DQN_TRIENVONG))        
         
-        count = 1
         with open("results.txt", "w+") as f:
             for (image, label, idx) in tqdm(self.test_loader):
-                if count == NUM_TESTS:
-                    break
+                self.frequency = [0] * self.num_grids ** 2
+
 
                 folder_image = os.path.join(TEST_FOLDER, str(idx.item()))
                 if not os.path.exists(folder_image):
@@ -299,8 +297,7 @@ class Agent():
                     
                     # take action
                     action = self.select_action_model(current_state, "test") # index of grid                     
-                    actions.append(action)
-                    print(actions)
+                    self.frequency[action] += 1
                                         
                     image_clone = self.make_action(image_clone, action)
                     save_image(image_clone, os.path.join(folder_image, f"process.png"))
@@ -329,33 +326,33 @@ class Agent():
                         break
                     
                     current_state = next_state
-                    count += 1
             f.write(f"AVG_L2_norm: {avg_l2_norm/NUM_TESTS} \n AVG_querry: {avg_querry/NUM_TESTS} \n AVG_success_rate: {avg_success_rate/NUM_TESTS}\n")        
                     
     def inference(self, image):
-        self.policy_net.load_state_dict(torch.load(DQN_TRIENVONG))
         
+        self.policy_net.load_state_dict(torch.load(r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\model_0_new.pth"))
+        # self.policy_net.eval()
+        self.frequency = [0] * self.num_grids ** 2
+
         image = transforms.ToTensor()(image).unsqueeze(0)
-        
+
         output_folder = os.path.basename("test").split(".")[0]
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
         
-        self.policy_net.eval()
         save_image(image, os.path.join(output_folder, "origininal.png"))
         
         image_clone = image.clone()
         P_GT = self.classifier(image.cuda()).cpu() # P_GT
         pred = torch.argmax(P_GT).item() # label = pred
         P_pred = P_GT[0][pred] # P_pred  
-        P_lists = []
         print("\nLabel pred: ", pred)
         print("Probability Pred: ", P_pred)  
         
                                         
         # init
         # l2_lists = deque([0, 0, 0, 0], maxlen=4)
-        actions_list = deque([0, 0, 0, 0], maxlen=4)
+        actions_list = deque([0.002, 0.003, 0.004, 0.005], maxlen=4)
         sensities = self.cal_sensities(image_clone, P_pred, pred)
         features = self.classifier.features(image_clone.cuda()).view(-1).cpu()                
         current_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
@@ -365,42 +362,39 @@ class Agent():
                 save_image(image_clone,os.path.join(output_folder, "not_sucess.png"))
                 break
             
+            
             # take action
-            action = self.select_action_model(current_state, "train") # index of grid                     
-            # self.action_lists.append(action)
-            print(action)
+            action = self.select_action_model(current_state, "test") # index of grid                     
+            self.frequency[action] += 1
+            print("\n", action)
+            print(self.frequency[action])
             
             image_clone = self.make_action(image_clone, action)
-            # save_image(image_clone, os.path.join(output_folder, f"process_{step}.png")) # os.path.join(output_folder, f"process_{step}.png")
-            
+            save_image(image_clone, os.path.join(output_folder, f"process.png"))
+
             # reward
             l2_norm = self.cal_l2(image_clone, image)
             actions_list.append(action)
             P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
-            P_lists.append(P_noise_pred)
             print("P_noise: ", P_noise_pred[pred]) 
-            # print(reward)
 
             if torch.argmax(P_noise_pred).item() != pred: 
                 save_image(image_clone, os.path.join(output_folder, f"success{l2_norm}.png"))
                 print("Success")
                 break
                         
-            # observation
             sensities = self.cal_sensities(image_clone, P_pred, pred)
             features = self.classifier.features(image_clone.unsqueeze(0).cuda()).view(-1).cpu()        
             
-            # compose state
             next_state = torch.cat((features ,sensities, torch.flatten(torch.tensor(actions_list))))
             current_state = next_state
                
-        if self.epsilon > 0.1:
-            self.epsilon -= 0.9 / 5
+            # if self.epsilon > 0.1:
+            #     self.epsilon -= 0.9 / 5
             
 # a = Agent(False)
-# # # a.test()
-# # a.train()
-# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\Adversarial_Attack_deeplearning\origininal.png"
+# a.test()
+# path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\view_new\kaggle\working\RLAT-Reforinment-Learing-in-Adversairal-Attack\Adversarial_Attack_deeplearning\view\8\origininal.png"
 # image = Image.open(path)
 # a.inference(image)
                         

@@ -292,6 +292,8 @@ class Agent():
                 for step in range(self.max_iter + 1):
                     if step == self.max_iter:
                         avg_querry += 300
+                        avg_l2_norm += l2_norm
+
                         save_image(image_clone, os.path.join(folder_image, "not_sucess.png"))
                         break
                     
@@ -305,7 +307,6 @@ class Agent():
                     
                     # reward
                     l2_norm = self.cal_l2(image_clone, image)
-                    avg_l2_norm += l2_norm
                     
                     actions_list.append(action)
                     P_noise_pred = self.classifier(image_clone.unsqueeze(0).cuda()).cpu()[0]
@@ -321,6 +322,7 @@ class Agent():
                     if torch.argmax(P_noise_pred).item() != pred:
                         avg_querry += step
                         avg_success_rate += 1
+                        avg_l2_norm += l2_norm
                         save_image(image_clone, os.path.join(folder_image, f"noise_{l2_norm}.png"))
                         print("Success")
                         break
@@ -391,8 +393,8 @@ class Agent():
             # if self.epsilon > 0.1:
             #     self.epsilon -= 0.9 / 5
             
-# a = Agent(False)
-# a.test()
+a = Agent(False)
+a.test()
 # path = r"D:\Reforinment-Learing-in-Advesararial-Attack-with-Image-Classification-Model\view_new\kaggle\working\RLAT-Reforinment-Learing-in-Adversairal-Attack\Adversarial_Attack_deeplearning\view\8\origininal.png"
 # image = Image.open(path)
 # a.inference(image)

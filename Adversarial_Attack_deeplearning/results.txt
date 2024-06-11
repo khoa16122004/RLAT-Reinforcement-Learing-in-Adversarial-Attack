@@ -1,0 +1,3 @@
+AVG_L2_norm: 7.48809192856 
+ AVG_querry: 296.21 
+ AVG_success_rate: 0.21
